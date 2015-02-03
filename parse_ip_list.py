@@ -28,7 +28,7 @@ class IpParse:
                              shell=True, stdout=sb.PIPE)
                 raw_ip_list = p.stdout.read().split("\n")
                 for item in raw_ip_list:
-                    self.ip_list.add(item.rlace("route:", "").strip())
+                    self.ip_list.add(item.replace("route:", "").strip())
 
         except Exception as e:
             print e
@@ -92,15 +92,14 @@ class IpParse:
 
     def merge(self):
         merge_list = cidr_merge(self.ip_list)
-        tmp_list = []
+        self.ip_list.clear()
         for item in merge_list:
-            tmp_list.append(str(item))
-
+            self.ip_list.add(str(item))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", action="store", dest="domain", help="domain name,eg: google.com")
-    parser.add_argument("-f", action="store", dest="file", help="domain name list in file,eg: /root/domain.list")
+    parser.add_argument("-f", action="store", dest="file", help="domain name list file,eg: /root/domain.list")
     parser.add_argument("-m", action="store_true", dest="merge", help="merge result")
     parser.add_argument("-o", action="store_true", dest="openvpn", help="openvpn result")
     args = parser.parse_args()
