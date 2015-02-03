@@ -3,10 +3,13 @@ import re
 import httplib2
 import subprocess as sb
 from netaddr import IPNetwork, IPSet, cidr_merge
+import argparse
 
 
 class IpParse:
-    def __init__(self, domain_list_file="domain.list", site=""):
+    def __init__(self, site="", domain_list_file="domain.list"):
+        if not domain_list_file:
+            domain_list_file = "domain.list"
         self.site = site
         self.http = httplib2.Http()
         self.ip_list = set()
@@ -25,7 +28,7 @@ class IpParse:
                              shell=True, stdout=sb.PIPE)
                 raw_ip_list = p.stdout.read().split("\n")
                 for item in raw_ip_list:
-                    self.ip_list.update(item.replace("route:", "").strip())
+                    self.ip_list.add(item.rlace("route:", "").strip())
 
         except Exception as e:
             print e
@@ -95,7 +98,18 @@ class IpParse:
 
 
 if __name__ == "__main__":
-    parse = IpParse()
-    parse.run()
-    parse.merge()
-    parse.out_for_openvpn()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-d", action="store", dest="domain", help="domain name,eg: google.com")
+    parser.add_argument("-f", action="store", dest="file", help="domain name list in file,eg: /root/domain.list")
+    parser.add_argument("-m", action="store_true", dest="merge", help="merge result")
+    parser.add_argument("-o", action="store_true", dest="openvpn", help="openvpn result")
+    args = parser.parse_args()
+
+    ip_parse = IpParse(site=args.domain, domain_list_file=args.file)
+    ip_parse.run()
+    if args.merge:
+        ip_parse.merge()
+    if args.openvpn:
+        ip_parse.out_for_openvpn()
+    else:
+        ip_parse.out()
