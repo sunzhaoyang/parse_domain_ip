@@ -6,8 +6,8 @@ from netaddr import IPNetwork, IPSet, cidr_merge
 
 
 class IpParse:
-    def __init__(self, domain_list_file="domain.list"):
-        self.site = ""
+    def __init__(self, domain_list_file="domain.list", site=""):
+        self.site = site
         self.http = httplib2.Http()
         self.ip_list = set()
         self.domain_list = open(domain_list_file, "r")
@@ -25,7 +25,7 @@ class IpParse:
                              shell=True, stdout=sb.PIPE)
                 raw_ip_list = p.stdout.read().split("\n")
                 for item in raw_ip_list:
-                    self.ip_list.add(item.replace("route:", "").strip())
+                    self.ip_list.update(item.replace("route:", "").strip())
 
         except Exception as e:
             print e
@@ -68,12 +68,18 @@ class IpParse:
         return result
 
     def run(self):
-        for line in self.domain_list:
-            if "google" in line or "youtube" in line:
+        if self.site:
+            if "google" in self.site or "youtube" in self.site:
                 self.parse_google_ip()
             else:
-                self.site = line.replace("\n", "")
                 self.parse_ip_by_asn()
+        else:
+            for line in self.domain_list:
+                if "google" in line or "youtube" in line:
+                    self.parse_google_ip()
+                else:
+                    self.site = line.replace("\n", "")
+                    self.parse_ip_by_asn()
 
     def out(self):
         print "\n".join(sorted(self.ip_list, reverse=True))
@@ -86,6 +92,7 @@ class IpParse:
         tmp_list = []
         for item in merge_list:
             tmp_list.append(str(item))
+
 
 if __name__ == "__main__":
     parse = IpParse()
