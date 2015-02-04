@@ -2,7 +2,7 @@
 import re
 import httplib2
 import subprocess as sb
-from netaddr import IPNetwork, IPSet, cidr_merge
+from netaddr import IPNetwork, cidr_merge
 import argparse
 
 
