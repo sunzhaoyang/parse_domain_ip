@@ -28,8 +28,7 @@ class IpParse:
                              shell=True, stdout=sb.PIPE)
                 raw_ip_list = p.stdout.read().split("\n")
                 for item in raw_ip_list:
-                    if item:
-                        self.ip_list.add(item.replace("route:", "").strip())
+                    self.ip_list.add(item.replace("route:", "").strip())
 
         except Exception as e:
             print e
@@ -84,6 +83,9 @@ class IpParse:
                 else:
                     self.site = line.replace("\n", "")
                     self.parse_ip_by_asn()
+
+        if "" in self.ip_list:
+            self.ip_list.remove("")
 
     def out(self):
         print "\n".join(sorted(self.ip_list, reverse=True))
