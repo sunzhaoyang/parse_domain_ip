@@ -28,7 +28,8 @@ class IpParse:
                              shell=True, stdout=sb.PIPE)
                 raw_ip_list = p.stdout.read().split("\n")
                 for item in raw_ip_list:
-                    self.ip_list.add(item.replace("route:", "").strip())
+                    if item:
+                        self.ip_list.add(item.replace("route:", "").strip())
 
         except Exception as e:
             print e
